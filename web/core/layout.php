@@ -1,11 +1,21 @@
 <?php
 // This is the layout file for the site. It contains the header, footer, and navigation bar.
+
 /**
  * Layout constructs the HTML layout for the site.
- * @param string|callable $content The content to display in the layout. This can be a string or a function that returns a string that will be required into this file.
- */
-function layout($content)
+ * @param callable $pagePath The path to the page to be included in the layout.
+ */ 
+function layout($pagePath)
 {
+  $page = $pagePath;
+  $page = file_exists($page . ".php") ? $page . ".php" : $page . "/index.php";
+  if (file_exists($page)) {
+    require($page);
+
+    
+  } else {
+    echo "Page not found";
+  }
   ?>
   <!DOCTYPE html>
   <html lang="en">
@@ -13,10 +23,14 @@ function layout($content)
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>
-      <?php echo "Test" ?>
-    </title>
     <link rel="stylesheet" href="/core/styles/main.css">
+
+    <?php
+    if (function_exists("head")) {
+      head();
+    }
+    ?>
+    
   </head>
 
   <body>
@@ -44,21 +58,23 @@ function layout($content)
         </ul>
       </nav>
     </div>
+    <?php
+    if (function_exists("page_before")) {
+      page_before();
+    }
+    ?>
     <main class="page-content">
       <?php
-      if (is_callable($content)) {
-        $page = $content();
-        $page = (file_exists($page . ".php") ? $page . ".php" : $page . "/index.php");
-        if (file_exists($page)) {
-          require_once($page);
-        } else {
-          echo "Page not found";
-        }
-      } else {
-        echo $content;
+      if (function_exists("page")) {
+        page();
       }
       ?>
     </main>
+    <?php
+    if (function_exists("page_after")) {
+      page_after();
+    }
+    ?>
   </body>
 
   </html>

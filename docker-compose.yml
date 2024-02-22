@@ -1,0 +1,29 @@
+services:
+  openpanel:
+    image: openpanel
+    build: .
+    volumes:
+      - ./nginx/templates/default.conf:/etc/nginx/sites-available/default
+      - ./nginx/templates/nginx.conf:/etc/nginx/nginx.conf
+      - ./web:/var/www/html
+      - mysql-lock:/var/run/mysqld
+    depends_on:
+      - mysql
+    ports:
+      - "3080:80"
+    environment:
+      - OPENPANEL_ENVIRONMENT=docker
+
+  mysql:
+    image: mysql
+    volumes:
+      - mysql-lock:/var/run/mysqld
+    environment:
+      MYSQL_ROOT_PASSWORD: openpanel
+      MYSQL_DATABASE: openpanel
+      MYSQL_USER: openpanel
+      MYSQL_PASSWORD: openpanel
+
+volumes:
+  mysql-lock:
+    driver: local

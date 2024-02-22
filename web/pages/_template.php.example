@@ -1,0 +1,30 @@
+<?php
+
+/**
+ * The `head` function is called by the layout to render the `<head></head>` of the site.
+ * Everything will be rendered inside the `<head></head>` tag. You shoul not include the `<head></head>` tags.
+ * This can be used to include title, extra stylesheets, scripts, and other meta tags to this page.
+ */
+function head() {
+  ?>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+      OpenPanel - Example
+    </title>
+  <?php
+}
+
+
+/**
+ * The `page` function is called by the layout to render the page content.
+ * It will be applied to the main content area of the site.
+ */
+function page() {
+  ?>
+    <div>
+      OpenPanel page!
+    </div>
+  <?php
+}
+?>

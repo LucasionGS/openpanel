@@ -4,16 +4,26 @@ class Database {
   private $user;
   private $password;
   private $database;
-  private $connection;
+  public function setDatabase(string $database) {
+    $this->database = $database;
+    if ($this->connection) {
+      $this->connection->select_db($database);
+    }
+  }
+  public $connection;
 
-  public function __construct($host, $user, $password, $database) {
+  public function __construct($host, $user, $password, $database = "") {
     $this->host = $host;
     $this->user = $user;
     $this->password = $password;
     $this->database = $database;
+    $this->reconnect();
+  }
+
+  public function reconnect() {
     $this->connection = new mysqli($this->host, $this->user, $this->password, $this->database);
     if ($this->connection->connect_error) {
-      die("Connection failed: " . $this->connection->connect_error);
+      throw new Exception("Connection failed: " . $this->connection->connect_error);
     }
   }
 
@@ -25,7 +35,7 @@ class Database {
   public function query($query) {
     $result = $this->connection->query($query);
     if (!$result) {
-      die("Query failed: " . $this->connection->error);
+      throw new Exception("Query failed: " . $this->connection->error);
     }
 
     if (gettype($result) === "boolean") {
@@ -46,6 +56,8 @@ class Database {
   }
 
   public function close() {
-    $this->connection->close();
+    if ($this->connection) {
+      $this->connection->close();
+    }
   }
 }

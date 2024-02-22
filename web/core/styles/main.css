@@ -60,7 +60,6 @@
 
 /* Layout */
 body {
-  display: block;
   background-color: #fafafa;
   font-family:
     "Roboto-Regular",
@@ -87,6 +86,12 @@ body {
   flex-direction: row;
   width: 100%;
   min-height: 100vh;
+}
+
+@media screen and (max-width: 768px) {
+  body {
+    flex-direction: column;
+  }
 }
 
 /* Side panel on the left */
@@ -116,6 +121,21 @@ nav.navpanel ul {
   overflow-x: hidden;
 }
 
+@media screen and (max-width: 768px) {
+  nav.navpanel {
+    width: 100%;
+  }
+
+  nav.navpanel:hover {
+    width: 100%;
+  }
+  
+  nav.navpanel ul {
+    display: flex;
+    flex-direction: row;
+  }
+}
+
 nav.navpanel ul li {
   border-bottom: 1px solid #e0e0e0;
   padding: 0 4px;
@@ -131,6 +151,14 @@ nav.navpanel ul li {
 
 nav.navpanel ul li:hover {
   background-color: #008000;
+}
+
+nav.navpanel.navpanel--yellow ul li {
+  background-color: #ffcc00;
+}
+
+nav.navpanel.navpanel--yellow ul li:hover {
+  background-color: #ff9900;
 }
 
 nav.navpanel ul li img,
@@ -157,6 +185,17 @@ nav.navpanel:hover ul li h3 {
   opacity: 1;
 }
 
+@media screen and (max-width: 768px) {
+  nav.navpanel ul li {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  nav.navpanel ul li h3 {
+    display: none;
+  }
+}
+
 nav.navpanel ul a:hover {
   text-decoration: underline;
 }
@@ -164,8 +203,10 @@ nav.navpanel ul a:hover {
 main.page-content {
   display: block;
   padding: 16px;
+  box-sizing: border-box;
   width: 100%;
 }
+
 /* /Layout */
 
 /* Forms */
@@ -213,6 +254,31 @@ input {
   box-sizing: border-box;
 }
 
+select {
+  display: inline-block;
+  width: 256px;
+  padding: 8px;
+  margin: 8px 0;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+/* Desc - Used for a lower opacity description under an input field */
+desc {
+  display: block;
+  font-size: 14px;
+  opacity: 0.6;
+  margin: 0;
+  margin-left: 8px;
+  margin-bottom: 8px;
+  padding: 0;
+  color: #1f1f1f;
+  line-height: 1.5;
+  transition: opacity 0.3s;
+}
+/* /Desc */
+
 /* /Forms */
 
 /* Tables */
@@ -221,6 +287,10 @@ table {
   border-collapse: collapse;
   width: 100%;
   table-layout: fixed;
+
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  overflow: hidden;
 }
 
 table th {
@@ -228,6 +298,18 @@ table th {
   color: white;
   padding: 8px;
   text-align: left;
+}
+
+table td {
+  padding: 8px;
+  padding-left: 8px;
+  transition: padding-left 0.3s, background-color 0.3s;
+  text-align: left;
+}
+
+table td:hover {
+  background-color: #ababab;
+  padding-left: 16px;
 }
 
 table tr:nth-child(even) {

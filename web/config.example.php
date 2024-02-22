@@ -8,7 +8,7 @@ if ($CFG->debug) {
   error_reporting(E_ALL);
 }
 
-$CFG->db_host     = "localhost";
-$CFG->db_user     = "";
-$CFG->db_password = "";
+$CFG->db_host     = "mysql";
+$CFG->db_user     = "openpanel";
+$CFG->db_password = "openpanel";
 $CFG->db_database = "openpanel";

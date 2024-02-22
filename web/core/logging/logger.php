@@ -6,7 +6,7 @@ class Logger {
     ?>
     <div class="info-box">
       <h2><?= $title ?></h2>
-      <p><?= $message ?></p>
+      <pre><?= $message ?></pre>
     </div>
     <?php
   }
@@ -17,7 +17,7 @@ class Logger {
     ?>
     <div class="info-box info-box-warning">
       <h2><?= $title ?></h2>
-      <p><?= $message ?></p>
+      <pre><?= $message ?></pre>
     </div>
     <?php
   }
@@ -28,7 +28,7 @@ class Logger {
     ?>
     <div class="info-box info-box-error">
       <h2><?= $title ?></h2>
-      <p><?= $message ?></p>
+      <pre><?= $message ?></pre>
     </div>
     <?php
   }
