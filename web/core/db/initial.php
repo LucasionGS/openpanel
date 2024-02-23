@@ -1,9 +1,7 @@
 <?php
 function initial_database_setup(mysqli $sql, string $db_database) {
   // Drop the database if it exists
-  if ($sql->query("DROP DATABASE IF EXISTS $db_database")) {
-    Logger::log("Database dropped successfully");
-  } else {
+  if (!$sql->query("DROP DATABASE IF EXISTS $db_database")) {
     Logger::error("Error dropping database: " . $sql->error);
   }
 

@@ -1,0 +1,14 @@
+<?php
+$CFG = new stdClass();
+$CFG->debug = true;
+
+if ($CFG->debug) {
+  ini_set('display_errors', 1);
+  ini_set('display_startup_errors', 1);
+  error_reporting(E_ALL);
+}
+
+$CFG->db_host     = "{{db_host}}";
+$CFG->db_user     = "{{db_user}}";
+$CFG->db_password = "{{db_password}}";
+$CFG->db_database = "{{db_database}}";

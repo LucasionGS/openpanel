@@ -202,9 +202,12 @@ nav.navpanel ul a:hover {
 
 main.page-content {
   display: block;
-  padding: 16px;
   box-sizing: border-box;
   width: 100%;
+}
+
+main.page-content.page-content-margin {
+  padding: 16px;
 }
 
 /* /Layout */

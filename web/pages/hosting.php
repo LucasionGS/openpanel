@@ -20,13 +20,19 @@ function page()
             $hostname = $_POST["hostname"];
             $port = $_POST["port"];
             $sql->query("INSERT INTO hosts (hostname, port) VALUES ('$hostname', '$port')");
+            Logger::storeLog("Created new host: $hostname:$port");
           }
           break;
 
         case "delete":
           if (isset($_POST["id"])) {
             $id = $_POST["id"];
-            $sql->query("DELETE FROM hosts WHERE id = $id");
+            if ($sql->query("DELETE FROM hosts WHERE id = $id")) {
+              Logger::storeLog("Deleted host with ID: $id");
+            }
+            else {
+              Logger::error("Failed to delete host with ID: $id");
+            }
           }
           break;
 

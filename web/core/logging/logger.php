@@ -1,4 +1,6 @@
 <?php
+require(__DIR__ . "/../sql.php");
+$GLOBALS["sql"] = $sql;
 class Logger {
   // Gray info box
   public static function log($message, ?string $title = null) {
@@ -20,6 +22,8 @@ class Logger {
       <pre><?= $message ?></pre>
     </div>
     <?php
+
+    self::storeLog($message);
   }
 
   // Yellow info box
@@ -31,5 +35,15 @@ class Logger {
       <pre><?= $message ?></pre>
     </div>
     <?php
+
+    self::storeLog($message);
+  }
+
+  public static function storeLog($message) {
+    global $sql;
+    $query = "INSERT INTO logs (message) VALUES ('".
+      $sql->connection->escape_string($message)
+    ."')";
+    $sql->query($query);
   }
 }

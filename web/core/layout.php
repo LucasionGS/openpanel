@@ -12,6 +12,10 @@ function layout($pagePath)
   if (file_exists($page)) {
     require($page);
 
+
+    // Meta options
+    // This is a way to pass options to the layout from the page
+    $meta = $meta ?? [];
     
   } else {
     echo "Page not found";
@@ -62,8 +66,10 @@ function layout($pagePath)
     if (function_exists("page_before")) {
       page_before();
     }
+
+    $useMargin = $meta["margin"] ?? true;
     ?>
-    <main class="page-content">
+    <main class="page-content <?= $useMargin ? "page-content-margin" : "" ?>">
       <?php
       if (function_exists("page")) {
         page();
