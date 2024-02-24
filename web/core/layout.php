@@ -7,18 +7,18 @@
  */ 
 function layout($pagePath)
 {
+  $pageNotFound = false;
   $page = $pagePath;
   $page = file_exists($page . ".php") ? $page . ".php" : $page . "/index.php";
   if (file_exists($page)) {
     require($page);
-
 
     // Meta options
     // This is a way to pass options to the layout from the page
     $meta = $meta ?? [];
     
   } else {
-    echo "Page not found";
+    $pageNotFound = true;
   }
   ?>
   <!DOCTYPE html>
@@ -27,6 +27,7 @@ function layout($pagePath)
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/core/styles/tailwind.min.css">
     <link rel="stylesheet" href="/core/styles/main.css">
 
     <?php
@@ -71,6 +72,11 @@ function layout($pagePath)
     ?>
     <main class="page-content <?= $useMargin ? "page-content-margin" : "" ?>">
       <?php
+      if ($pageNotFound) {
+        require(__DIR__ . "/logging/logger.php");
+        Logger::error("Page not found: $page");
+        http_response_code(404);
+      }
       if (function_exists("page")) {
         page();
       }

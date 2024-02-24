@@ -1,6 +1,4 @@
 <?php
-require(__DIR__ . "/../sql.php");
-$GLOBALS["sql"] = $sql;
 class Logger {
   // Gray info box
   public static function log($message, ?string $title = null) {
@@ -40,7 +38,7 @@ class Logger {
   }
 
   public static function storeLog($message) {
-    global $sql;
+    require(__DIR__ . "/../sql.php");
     $query = "INSERT INTO logs (message) VALUES ('".
       $sql->connection->escape_string($message)
     ."')";

@@ -51,7 +51,8 @@ function page()
   <div>
     <form method="post">
       <input type="hidden" name="action" value="create">
-      <div style="display: flex; gap: 16px;">
+      <!-- <div style="display: flex; gap: 16px;"> -->
+      <div class="bg-silver">
         <div>
           <label for="hostname">Hostname</label>
           <br>
