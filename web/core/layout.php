@@ -10,15 +10,39 @@ function layout($pagePath)
   $pageNotFound = false;
   $page = $pagePath;
   $page = file_exists($page . ".php") ? $page . ".php" : $page . "/index.php";
+
+  // Navigation bar sections
+  $navSections = [
+    "Home" => ["/", __DIR__ . "/icons/walk.svg"],
+    "Hosting" => ["/hosting", __DIR__ . "/icons/server-2.svg"],
+    "Database" => ["/database", __DIR__ . "/icons/database.svg"]
+  ];
+  
   if (file_exists($page)) {
     require($page);
 
-    // Meta options
-    // This is a way to pass options to the layout from the page
-    $meta = $meta ?? [];
     
   } else {
     $pageNotFound = true;
+  }
+  
+  // Meta options
+  // This is a way to pass options to the layout from the page
+  $meta = $meta ?? [];
+
+  // Meta variables
+  $title = $meta["title"] ?? "Openpanel - Hosting Control Panel";
+
+  // Setup extra navigation sections
+  if (isset($meta["nav"])) {
+    $navSecs = $meta["nav"];
+
+    foreach ($navSecs as $section => $sectionData) {
+      $path = $sectionData[0];
+      $icon = $sectionData[1] ?? null;
+      $navSections[$section] = [$path, $icon];
+    }
+    
   }
   ?>
   <!DOCTYPE html>
@@ -29,6 +53,7 @@ function layout($pagePath)
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/core/styles/tailwind.min.css">
     <link rel="stylesheet" href="/core/styles/main.css">
+    <title><?= $title ?></title>
 
     <?php
     if (function_exists("head")) {
@@ -42,24 +67,16 @@ function layout($pagePath)
     <div>
       <nav class="navpanel">
         <ul>
-          <a href="/">
-            <li>
-              <?php echo importSvg(__DIR__ . "/icons/walk.svg") ?>
-              <h3>Home</h3>
-            </li>
-          </a>
-          <a href="/hosting">
-            <li>
-              <?php echo importSvg(__DIR__ . "/icons/server-2.svg") ?>
-              <h3>Hosting</h3>
-            </li>
-          </a>
-          <a href="/database">
-            <li>
-              <?php echo importSvg(__DIR__ . "/icons/database.svg") ?>
-              <h3>Database</h3>
-            </li>
-          </a>
+          <?php
+          foreach ($navSections as $section => $sectionData) {
+            $path = $sectionData[0];
+            $icon = $sectionData[1] ?? null;
+            echo "<a href=\"$path\"><li>";
+            if (isset($icon)) echo importSvg($icon);
+            echo "<h3>$section</h3>";
+            echo "</li></a>";
+          }
+          ?>
         </ul>
       </nav>
     </div>

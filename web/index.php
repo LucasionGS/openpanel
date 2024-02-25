@@ -16,9 +16,37 @@ try {
   }
 }
 
+function checkApiEndpoint($path) {
+  $corePage = $path;
+  $corePage = file_exists($corePage . ".php") ? $corePage . ".php" : $corePage . "/index.php";
+  if (file_exists($corePage)) {
+    require($corePage);
+    return true;
+  }
+  return false;
+}
+
+// API -- First section is core's API,
+// second section is the API endpoints defined in pages/api,
+// third section is the API endpoints defined in extensions
+if ($sections[1] === "api") {
+  if (checkApiEndpoint(__DIR__ . "/core" . $path)) {exit;}
+  else if (checkApiEndpoint(__DIR__ . "/pages" . $path)) {exit;}
+  else {
+    header("HTTP/1.1 404 Not Found");
+    echo "404 Not Found: " . $path;
+    exit;
+  }
+}
+
 if ($sections[1] === "_") {
+  $extensionName = $sections[2];
+  // Third section of API is extensions
+  if (($sections[3] ?? "") === "api" && checkApiEndpoint(
+    __DIR__ . "/extensions" . ("/" . join("/", array_slice($sections, 2)))
+  )) { exit; }
+  
   $newPath = "/" . join("/", array_slice($sections, 2));
-  echo __DIR__ . "/extensions" . $newPath;
   layout(__DIR__ . "/extensions" . $newPath);
   exit;
 }

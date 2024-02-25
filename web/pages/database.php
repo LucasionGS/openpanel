@@ -3,15 +3,12 @@ require_once(__DIR__ . "/../core/db/database.php");
 require(__DIR__ . "/../core/logging/logger.php");
 
 $meta = [
-  "margin" => false
+  "margin" => false,
+  "title" => "OpenPanel - Databases",
+  "nav" => [
+    "OpenPanel/Logs" => ["/database?database=openpanel&table=logs", __DIR__ . "/../core/icons/database.svg"],
+  ]
 ];
-
-function head()
-{
-  ?>
-  <title>OpenPanel - Databases</title>
-  <?php
-}
 
 function page()
 {
