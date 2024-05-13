@@ -1,18 +1,17 @@
 <?php
-require_once(__DIR__ . "/../core/db/database.php");
-require(__DIR__ . "/../core/logging/logger.php");
+use OpenPanel\core\db\Database;
+use OpenPanel\core\logging\Logger;
 
 $meta = [
   "margin" => false,
   "title" => "OpenPanel - Databases",
   "nav" => [
-    "OpenPanel/Logs" => ["/database?database=openpanel&table=logs", __DIR__ . "/../core/icons/database.svg"],
+    // "OpenPanel/Logs" => ["/database?database=openpanel&table=logs", __DIR__ . "/../core/icons/database.svg"],
   ]
 ];
 
 function page()
 {
-  // global $currentCon;
   require(__DIR__ . "/../config.php");
   $currentCon = new Database($CFG->db_host, $CFG->db_user, $CFG->db_password);
   try {

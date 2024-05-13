@@ -1,8 +1,5 @@
 <?php
-require(__DIR__ . "/core/db/autoload.php");
-require(__DIR__ . "/core/styles/autoload.php");
-
-require(__DIR__ . "/core/layout.php");
+namespace OpenPanel;
 
 $path = $_SERVER["REQUEST_URI"];
 $path = explode("?", $path)[0];
@@ -15,6 +12,8 @@ try {
     exit;
   }
 }
+
+use OpenPanel\core\Layout;
 
 function checkApiEndpoint($path) {
   $corePage = $path;
@@ -47,8 +46,8 @@ if ($sections[1] === "_") {
   )) { exit; }
   
   $newPath = "/" . join("/", array_slice($sections, 2));
-  layout(__DIR__ . "/extensions" . $newPath);
+  Layout::render(__DIR__ . "/extensions" . $newPath);
   exit;
 }
 
-layout(__DIR__ . "/pages" . $path);
+Layout::render(__DIR__ . "/pages" . $path);

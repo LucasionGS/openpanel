@@ -1,4 +1,6 @@
 <?php
+namespace OpenPanel\core\logging;
+
 class Logger {
   // Gray info box
   public static function log($message, ?string $title = null) {
@@ -38,7 +40,7 @@ class Logger {
   }
 
   public static function storeLog($message) {
-    require(__DIR__ . "/../sql.php");
+    $sql = \OpenPanel\core\db\Database::getInstance();
     $query = "INSERT INTO logs (message) VALUES ('".
       $sql->connection->escape_string($message)
     ."')";

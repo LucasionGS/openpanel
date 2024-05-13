@@ -1,5 +1,6 @@
 <?php
-function initial_database_setup(mysqli $sql, string $db_database) {
+use OpenPanel\core\logging\Logger;
+function initial_database_setup(\mysqli $sql, string $db_database) {
   // Drop the database if it exists
   if (!$sql->query("DROP DATABASE IF EXISTS $db_database")) {
     Logger::error("Error dropping database: " . $sql->error);

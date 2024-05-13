@@ -1,8 +1,10 @@
 <?php
+use OpenPanel\core\auth\User;
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
-require_once(__DIR__ . "/../core/logging/logger.php");
+use OpenPanel\core\logging\Logger;
+use OpenPanel\core\db\Database;
 
 function head() {
   ?>
@@ -16,16 +18,16 @@ function page() {
   // $is_docker = getenv("OPENPANEL_ENVIRONMENT") === "docker";
   $is_docker = true;
   
-  $db_host = $is_docker ? "mysql" : $_POST["db_host"];
-  $db_user = $is_docker ? "openpanel" : $_POST["db_user"];
-  $db_password = $is_docker ? "openpanel" : $_POST["db_password"];
-  $db_database = $is_docker ? "openpanel" : $_POST["db_database"];
+  $db_host = $is_docker ? "mysql" : ($_POST["db_host"] ?? null);
+  $db_user = $is_docker ? "openpanel" : ($_POST["db_user"] ?? null);
+  $db_password = $is_docker ? "openpanel" : ($_POST["db_password"] ?? null);
+  $db_database = $is_docker ? "openpanel" : ($_POST["db_database"] ?? null);
   
-  $admin_user = $_POST["admin_user"];
-  $admin_password = $_POST["admin_password"];
+  $admin_user = $_POST["admin_user"] ?? null;
+  $admin_password = $_POST["admin_password"] ?? null;
   
   
-  if ($_POST["action"] == "finalize" && isset($db_host) && isset($db_user) && isset($db_password) && isset($db_database)) {
+  if (($_POST["action"] ?? null) == "finalize" && isset($db_host) && isset($db_user) && isset($db_password) && isset($db_database)) {
     $config = file_get_contents(__DIR__ . "/../core/templates/config.php.template");
 
     $params = [
@@ -50,8 +52,11 @@ function page() {
       try {
         initial_database_setup($mysqli, $db_database);
         
-        $sql = "INSERT INTO users (username, password) VALUES ('$admin_user', '$admin_password')";
-        if ($db->query($sql) !== TRUE) {
+        // $sql = "INSERT INTO users (username, password) VALUES ('$admin_user', '$admin_password')";
+        // if ($db->query($sql) !== TRUE) {
+        //   Logger::error("Error creating admin user: " . $mysqli->error);
+        // }
+        if (!User::create($admin_user, $admin_password)) {
           Logger::error("Error creating admin user: " . $mysqli->error);
         }
         

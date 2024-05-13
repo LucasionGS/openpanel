@@ -108,6 +108,8 @@ nav.navpanel {
   z-index: 1000;
 
   transition: width 0.3s;
+
+  /* position: fixed; */
 }
 
 nav.navpanel:hover {
@@ -231,20 +233,28 @@ button:hover, input[type="submit"]:hover, input[type="button"]:hover {
   background-color: #008000;
 }
 
-.btn-red {
-  background-color: #ba0000;
-}
-
-.btn-red:hover {
-  background-color: #da0000;
-}
-
-input[type="submit"] {
+button[type="submit"], input[type="submit"] {
   background-color: #00b3a4;
 }
 
-input[type="submit"]:hover {
+button[type="submit"]:hover, input[type="submit"]:hover {
   background-color: #008c7a;
+}
+
+.btn-standard {
+  background-color: #a6a6a6 !important;
+}
+
+.btn-standard:hover {
+  background-color: #8c8c8c !important;
+}
+
+.btn-danger {
+  background-color: #ba0000 !important;
+}
+
+.btn-danger:hover {
+  background-color: #da0000 !important;
 }
 
 input {
@@ -317,6 +327,11 @@ table td:hover {
 
 table tr:nth-child(even) {
   background-color: #f2f2f2;
+}
+
+table button {
+  margin: 0;
+  padding: 4px 8px;
 }
 
 /* /Tables */
