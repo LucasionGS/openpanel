@@ -124,30 +124,42 @@ function page() {
     array_pop($exploded);
     $configPath = implode("/", $exploded) . "/config.php";
     
-    if (file_put_contents($configPath, $config)) {
-      Logger::log(
-        htmlspecialchars($config),
-        "Successfully wrote to <code>$configPath</code>. You can now <a href='/'>go to the home page</a>."
-      );
+    
+    if (!file_exists($configPath)) {
+      if (file_put_contents($configPath, $config)) {
+        Logger::log(
+          htmlspecialchars($config),
+          "Successfully wrote to <code>$configPath</code>. You can now <a href='/'>go to the home page</a>."
+        );
+      }
+      else {
+        Logger::warn(
+          htmlspecialchars($config),
+          "Failed to write to <code>$configPath</code>. Please create the file and paste the following content:"
+        );
+        ?>
+        <script>
+          function goHome() {
+            if (confirm("Make sure you have created the index.php file BEFORE you go to home! Continue?")) {
+              window.location.href = "/";
+            }
+          }
+        </script>
+        <button
+          onclick="goHome()"
+        >Go to home page</button>
+        <?php
+      }
     }
     else {
       Logger::warn(
-        htmlspecialchars($config),
-        "Failed to write to <code>$configPath</code>. Please create the file and paste the following content:"
+        "If this is intentional, you can <a href='/'>go to the home page</a>.",
+        "The file <code>$configPath</code> already exists"
       );
       ?>
-      <script>
-        function goHome() {
-          if (confirm("Make sure you have created the index.php file BEFORE you go to home! Continue?")) {
-            window.location.href = "/";
-          }
-        }
-      </script>
-      <button
-        onclick="goHome()"
-      >Go to home page</button>
+        <a href="/"><button>Go to home page</button></a>
       <?php
-    }
+      }
     ?>
   <?php endif; ?>
 <?php

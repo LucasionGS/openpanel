@@ -1,5 +1,6 @@
 <?php
 use OpenPanel\core\logging\Logger;
+use OpenPanel\core\webhost\Host;
 
 function head()
 {
@@ -17,7 +18,8 @@ function page()
   $host = null;
   
   if (isset($editId) && is_numeric($editId)) {
-    $host = $sql->select("hosts", intval($editId))[0] ?? null;
+    // $host = $sql->select("hosts", intval($editId))[0] ?? null;
+    $host = Host::find(intval($editId));
 
     if (!$host) {
       Logger::error("No host found with ID: $editId");
@@ -58,7 +60,12 @@ function page()
             }
             else {
               // $sql->query("INSERT INTO hosts (hostname, port) VALUES ('$hostname', '$port')");
-              if ($sql->insert("hosts", [
+              // if ($sql->insert("hosts", [
+              //   "hostname" => $hostname,
+              //   "port" => $port,
+              //   "portssl" => $portssl ?: null
+              // ])) {
+              if (Host::insert([
                 "hostname" => $hostname,
                 "port" => $port,
                 "portssl" => $portssl ?: null
@@ -75,10 +82,7 @@ function page()
           break;
       }
     }
-
-    $hosts = $sql->query("SELECT * FROM hosts");
   } catch (\Throwable $th) {
-    $hosts = [];
     Logger::error($th->getMessage());
   }
   ?>
@@ -88,7 +92,7 @@ function page()
       <?php
       if ($host) {
         ?>
-        <input type="hidden" name="id" value="<?= $host["id"] ?>">
+        <input type="hidden" name="id" value="<?= $host->id ?>">
         <?php
       }
       ?>
@@ -100,7 +104,7 @@ function page()
           <label for="hostname">Hostname</label>
           <br>
           <input
-            value="<?= $host ? $host["hostname"] : "" ?>"
+            value="<?= $host ? $host->hostname : "" ?>"
             type="text"
             name="hostname"
             id="hostname"
@@ -113,7 +117,7 @@ function page()
           <label for="port">Port</label>
           <br>
           <input
-            value="<?= $host ? $host["port"] : "" ?>"
+            value="<?= $host ? $host->port : "80" ?>"
             type="number"
             name="port"
             id="port"
@@ -121,7 +125,6 @@ function page()
             max="65565"
             min="1"
             required
-            value="80"
           >
         </div>
 
@@ -129,7 +132,7 @@ function page()
           <label for="portssl">portssl</label>
           <br>
           <input
-            value="<?= $host ? $host["portssl"] : "" ?>"
+            value="<?= $host ? $host->portssl : "443" ?>"
             type="number"
             name="portssl"
             id="portssl"
@@ -137,7 +140,6 @@ function page()
             max="65565"
             min="1"
             required
-            value="443"
           >
         </div>
       </div>

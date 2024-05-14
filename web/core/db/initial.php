@@ -1,5 +1,7 @@
 <?php
 use OpenPanel\core\logging\Logger;
+use OpenPanel\core\Settings;
+use OpenPanel\core\Info;
 function initial_database_setup(\mysqli $sql, string $db_database) {
   // Drop the database if it exists
   if (!$sql->query("DROP DATABASE IF EXISTS $db_database")) {
@@ -23,6 +25,7 @@ function initial_database_setup(\mysqli $sql, string $db_database) {
       portssl INT DEFAULT 443
     )"
   );
+
   $sql->query(
     "CREATE TABLE IF NOT EXISTS users (
       id INT AUTO_INCREMENT PRIMARY KEY,
@@ -30,6 +33,7 @@ function initial_database_setup(\mysqli $sql, string $db_database) {
       password VARCHAR(255)
     )"
   );
+
   $sql->query(
     "CREATE TABLE IF NOT EXISTS logs (
       id INT AUTO_INCREMENT PRIMARY KEY,
@@ -37,11 +41,15 @@ function initial_database_setup(\mysqli $sql, string $db_database) {
       timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )"
   );
+
   $sql->query(
     "CREATE TABLE IF NOT EXISTS settings (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      name VARCHAR(255),
+      name VARCHAR(255) UNIQUE,
       value TEXT
     )"
   );
+
+  Settings::set("version", Info::$version);
+  Settings::set("build", Info::$build);
 }

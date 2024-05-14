@@ -1,5 +1,6 @@
 <?php
 use OpenPanel\core\logging\Logger;
+use OpenPanel\core\webhost\Host;
 
 function head()
 {
@@ -10,9 +11,9 @@ function head()
 
 function page()
 {
-  $sql = \OpenPanel\core\db\Database::getInstance();
+  // $sql = \OpenPanel\core\db\Database::getInstance();
   try {
-    $hosts = $sql->query("SELECT * FROM hosts");
+    $hosts = Host::all();
   } catch (\Throwable $th) {
     $hosts = [];
     Logger::error($th->getMessage());
@@ -40,24 +41,24 @@ function page()
         <?php foreach ($hosts as $host): ?>
           <tr>
             <td>
-              <?= $host["id"] ?>
+              <?= $host->id ?>
             </td>
             <td>
-              <?= $host["hostname"] ?>
+              <?= $host->hostname ?>
             </td>
             <td>
-              <?= $host["port"] ?>
+              <?= $host->port ?>
             </td>
             <td>
-              <?= isset($host["portssl"]) ? $host["portssl"] : "443" ?>
+              <?= $host->portssl ?: "443" ?>
             </td>
             <td>
-              <a href="/hosting/edit?id=<?= $host["id"] ?>">
+              <a href="<?= $host->getEditUrl() ?>">
                 <button type="submit" name="action" value="edit">
                   Edit
                 </button>
               </a>
-              <a href="/hosting/delete?id=<?= $host["id"] ?>">
+              <a href="<?= $host->getDeleteUrl() ?>">
                 <button type="submit" name="action" value="delete" class="btn-danger">
                   Delete
                 </button>

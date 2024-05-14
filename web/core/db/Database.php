@@ -1,5 +1,6 @@
 <?php
 namespace OpenPanel\core\db;
+use OpenPanel\core\logging\Logger;
 class Database {
   private $host;
   private $user;
@@ -167,7 +168,29 @@ class Database {
     if (self::$instance === null) {
       global $CFG;
       include(__DIR__ . "/../../config.php");
-      self::$instance = new Database($CFG->db_host, $CFG->db_user, $CFG->db_password, $CFG->db_database);
+      try {
+        self::$instance = new Database($CFG->db_host, $CFG->db_user, $CFG->db_password, $CFG->db_database);
+      } catch (\Throwable $th) {
+        Logger::error(
+          $th->getMessage()
+          . "<hr>" .
+          "This is likely due to the database not being set up. Visit <a href=\"/install\">the setup page</a> to set it up."
+          . "<br>" .
+          "<a href=\"/install\"><button>Begin setup</button></a>"
+        , "Database Error", false);
+        exit(1);
+      }
+
+      if (self::$instance->connection->connect_error) {
+        Logger::error(
+          self::$instance->connection->connect_error
+          . "<hr>" .
+          "This is likely due to the database not being set up. Visit <a href=\"/install\">the setup page</a> to set it up."
+          . "<br>" .
+          "<a href=\"/install\"><button>Begin setup</button></a>"
+        , "Database Error", false);
+        exit(1);
+      }
     }
     return self::$instance;
   }

@@ -1,5 +1,6 @@
 <?php
 use OpenPanel\core\logging\Logger;
+use OpenPanel\core\webhost\Host;
 
 function head()
 {
@@ -30,7 +31,8 @@ function page()
     $action = $_POST["action"];
     switch ($action) {
       case "delete":
-        if ($sql->query("DELETE FROM hosts WHERE id = $id")) {
+        // if ($sql->query("DELETE FROM hosts WHERE id = $id")) {
+        if (Host::delete($id)) {
           Logger::storeLog("Deleted host with ID: $id");
           header("Location: /hosting");
         }

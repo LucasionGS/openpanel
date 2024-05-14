@@ -14,7 +14,7 @@ class Logger {
   }
 
   // Yellow info box
-  public static function warn($message, ?string $title = null) {
+  public static function warn($message, ?string $title = null, $storeDb = true) {
     $title ??= "Warning";
     ?>
     <div class="info-box info-box-warning">
@@ -23,11 +23,11 @@ class Logger {
     </div>
     <?php
 
-    self::storeLog($message);
+    if ($storeDb) self::storeLog($message);
   }
 
   // Yellow info box
-  public static function error($message, ?string $title = null) {
+  public static function error($message, ?string $title = null, $storeDb = true) {
     $title ??= "Error";
     ?>
     <div class="info-box info-box-error">
@@ -36,7 +36,7 @@ class Logger {
     </div>
     <?php
 
-    self::storeLog($message);
+    if ($storeDb) self::storeLog($message);
   }
 
   public static function storeLog($message) {

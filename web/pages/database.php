@@ -14,6 +14,43 @@ function page()
 {
   require(__DIR__ . "/../config.php");
   $currentCon = new Database($CFG->db_host, $CFG->db_user, $CFG->db_password);
+
+  $created = $_GET["created"] ?? null;
+  $dropped = $_GET["dropped"] ?? null;
+  $action = $_REQUEST["action"] ?? null;
+
+  if ($dropped) {
+    ?>
+    <div style="background-color: #00aa00; color: white; padding: 8px; margin-bottom: 8px;">
+      Database "<?= $dropped ?>" dropped successfully
+    </div>
+    <?php
+  }
+
+  if ($created) {
+    ?>
+    <div style="background-color: #00aa00; color: white; padding: 8px; margin-bottom: 8px;">
+      Database "<?= $created ?>" created successfully
+    </div>
+    <?php
+  }
+
+  if (isset($action)) {
+    switch ($action) {
+      case 'create_db':
+        $database = $_GET["database"];
+
+        if (!$database) {
+          Logger::error("No database name provided");
+          return;
+        }
+        
+        $currentCon->query("CREATE DATABASE $database;");
+        header("Location: /database?created=$database");
+        return;
+    }
+  }
+
   try {
     $database = null;
     $databases = $currentCon->query("SHOW DATABASES;");
@@ -45,10 +82,31 @@ function page()
       }
 
       if ($exists) {
+        if ($action == "drop") {
+          if (isset($_POST["confirm"]) && $_POST["confirm"] == "1") {
+            $currentCon->query("DROP DATABASE $database;");
+            header("Location: /database?dropped=$database");
+            return;
+          }
+          else {
+            ?>
+            <div style="background-color: #aa0000; color: white; padding: 8px; margin-bottom: 8px;">
+              Are you sure you want to drop the database "<?= $database ?>"?
+              <form method="post">
+                <input type="hidden" name="action" value="drop">
+                <input type="hidden" name="confirm" value="1">
+                <button type="submit">Yes</button>
+              </form>
+            </div>
+            <?php
+          }
+        }
+
         $currentCon->setDatabase($database);
         $tables = $currentCon->query("SHOW TABLES;");
       } else {
         Logger::error("Database does not exist");
+        return;
       }
 
     }
@@ -59,6 +117,11 @@ function page()
   ?>
   <div style="display: flex; height: 100%;">
     <div style="background-color: darkslategray; padding: 8px; box-sizing: border-box; margin-right: 8px; height: 100%">
+      <form>
+        <input type="text" name="database" placeholder="Database">
+        <button type="submit" name="action" value="create_db">Create</button>
+      </form>
+      <hr>
       <?php
       foreach ($databases as $databaseEntry) {
         ?>
@@ -72,14 +135,15 @@ function page()
           if ($databaseEntry["Database"] === $database) {
             ?>
             <ul style="margin: 0;">
-              <?php
+            <?php
               foreach ($tables as $table) {
                 $name = $table["Tables_in_$database"];
                 $selected = ($_GET["table"] ?? "") === $name;
                 ?>
-                <a style="color: white; text-decoration: <?= $selected ? "underline" : "none" ?>;" href="?database=<?= $database ?>&table=<?= $name ?>">
+                <a style="padding-left: 8px; color: white; text-decoration: <?= $selected ? "underline" : "none" ?>;" href="?database=<?= $database ?>&table=<?= $name ?>">
                   <?= $name ?>
                 </a>
+                <br>
                 <?php
               }
               ?>
@@ -111,7 +175,27 @@ function page()
     ?>
 
     <div>
-      <h1>Databases</h1>
+      <h1>
+        <?php
+        if ($database) {
+          ?>
+          Databases - <?= $database ?>
+          <br>
+          <!-- Drop button -->
+          <form method="post" style="display: inline;">
+            <input type="hidden" name="action" value="drop">
+            <button type="submit" class="btn-danger">Drop</button>
+          </form>
+          <hr>
+          <?php
+        }
+        else {
+          ?>
+          Databases
+          <?php
+        }
+        ?>
+      </h1>
       <table>
         <thead>
           <tr>
