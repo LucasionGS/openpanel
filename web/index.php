@@ -1,5 +1,7 @@
 <?php
 namespace OpenPanel;
+use OpenPanel\core\auth\User;
+use OpenPanel\core\Extension;
 session_start();
 
 $path = $_SERVER["REQUEST_URI"];
@@ -12,6 +14,10 @@ try {
     header("Location: /install");
     exit;
   }
+}
+
+if ($path !== "/install") {
+  User::ensureAuthenticated();
 }
 
 use OpenPanel\core\Layout;
@@ -39,16 +45,16 @@ if ($sections[1] === "api") {
   }
 }
 
-if ($sections[1] === "_") {
-  $extensionName = $sections[2];
+$extensionName = $sections[2] ?? "";
+if ($sections[1] === "_" && $extensionName !== "" && Extension::isEnabled($extensionName)) {
   // Third section of API is extensions
   if (($sections[3] ?? "") === "api" && checkApiEndpoint(
     __DIR__ . "/extensions" . ("/" . join("/", array_slice($sections, 2)))
   )) { exit; }
   
   $newPath = "/" . join("/", array_slice($sections, 2));
-  Layout::render(__DIR__ . "/extensions" . $newPath);
+  Layout::renderMain(__DIR__ . "/extensions" . $newPath);
   exit;
 }
 
-Layout::render(__DIR__ . "/pages" . $path);
+Layout::renderMain(__DIR__ . "/pages" . $path);

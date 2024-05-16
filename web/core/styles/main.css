@@ -264,6 +264,11 @@ button[type="submit"]:hover, input[type="submit"]:hover {
   background-color: #da0000 !important;
 }
 
+button:disabled, input:disabled {
+  filter: grayscale(75%);
+  cursor: not-allowed;
+}
+
 input {
   display: inline-block;
   width: 256px;

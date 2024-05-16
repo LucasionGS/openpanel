@@ -119,6 +119,14 @@ abstract class Model {
     return static::from($result[0]);
   }
 
+  private static function toSQLValue(mixed $value): string {
+    $db = Database::getInstance();
+    if (is_int($value)) { return $value; }
+    if (is_bool($value)) { return $value ? 1 : 0; }
+    
+    return "'". $db->connection->real_escape_string($value) ."'";
+  }
+
   /**
    * Insert a record into the model.
    * 
@@ -129,7 +137,7 @@ abstract class Model {
     $db = Database::getInstance();
     $fields = implode(", ", array_keys($data));
     $values = implode(", ", array_map(function($value) {
-      return "'$value'";
+      return self::toSQLValue($value);
     }, array_values($data)));
     return $db->query("INSERT INTO " . static::getTable() . " ($fields) VALUES ($values)");
   }
@@ -144,7 +152,7 @@ abstract class Model {
   public static function update(int $id, array $data): bool {
     $db = Database::getInstance();
     $fields = implode(", ", array_map(function($key, $value) use ($db) {
-      return "$key = '". $db->connection->real_escape_string($value) . "'";
+      return "$key = " . self::toSQLValue($value);
     }, array_keys($data), array_values($data)));
     return $db->query("UPDATE " . static::getTable() . " SET $fields WHERE " . static::getPrimaryKey() . " = $id");
   }

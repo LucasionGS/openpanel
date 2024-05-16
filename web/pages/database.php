@@ -1,18 +1,22 @@
 <?php
 use OpenPanel\core\db\Database;
+use OpenPanel\core\Layout;
 use OpenPanel\core\logging\Logger;
 
-$meta = [
-  "margin" => false,
-  "title" => "OpenPanel - Databases",
-  "nav" => [
-    // "OpenPanel/Logs" => ["/database?database=openpanel&table=logs", __DIR__ . "/../core/icons/database.svg"],
-  ]
-];
+require(__DIR__ . "/../config.php");
+Layout::$meta->margin = false;
+Layout::$meta->title = "OpenPanel - Databases";
+if ($CFG->debug) {
+  Layout::$meta->nav = [
+    "OP/Logs" => ["/database?database=openpanel&table=logs", __DIR__ . "/../core/icons/database.svg"],
+  ];
+}
+// Layout::$meta->navbarEnabled = false;
+
 
 function page()
 {
-  require(__DIR__ . "/../config.php");
+  global $CFG;
   $currentCon = new Database($CFG->db_host, $CFG->db_user, $CFG->db_password);
 
   $created = $_GET["created"] ?? null;

@@ -5,11 +5,13 @@ use OpenPanel\core\logging\Logger;
 // This is the layout file for the site. It contains the header, footer, and navigation bar.
 
 class Layout {
+  public static Meta $meta;
+  
   /**
    * Layout constructs the HTML layout for the site.
    * @param callable $pagePath The path to the page to be included in the layout.
    */ 
-  static function render($pagePath)
+  static function renderMain($pagePath)
   {
     $pageNotFound = false;
     $page = $pagePath;
@@ -19,7 +21,8 @@ class Layout {
     $navSections = [
       "Home" => ["/", __DIR__ . "/icons/walk.svg"],
       "Hosting" => ["/hosting", __DIR__ . "/icons/server-2.svg"],
-      "Database" => ["/database", __DIR__ . "/icons/database.svg"]
+      "Database" => ["/database", __DIR__ . "/icons/database.svg"],
+      "Extensions" => ["/extend", __DIR__ . "/icons/puzzle.svg"],
     ];
     
     if (file_exists($page)) {
@@ -29,17 +32,13 @@ class Layout {
     } else {
       $pageNotFound = true;
     }
-    
-    // Meta options
-    // This is a way to pass options to the layout from the page
-    $meta = $meta ?? [];
 
     // Meta variables
-    $title = $meta["title"] ?? "Openpanel - Hosting Control Panel";
+    $title = self::$meta->title ?? "Openpanel - Hosting Control Panel";
 
     // Setup extra navigation sections
-    if (isset($meta["nav"])) {
-      $navSecs = $meta["nav"];
+    if (isset(self::$meta->nav)) {
+      $navSecs = self::$meta->nav;
 
       foreach ($navSecs as $section => $sectionData) {
         $path = $sectionData[0];
@@ -68,6 +67,9 @@ class Layout {
     </head>
 
     <body>
+      <?php
+      if (self::$meta->navbarEnabled ?? true):
+      ?>
       <div>
         <nav class="navpanel">
           <ul>
@@ -85,11 +87,13 @@ class Layout {
         </nav>
       </div>
       <?php
+      endif;
+      
       if (function_exists("page_before")) {
         "page_before"();
       }
 
-      $useMargin = $meta["margin"] ?? true;
+      $useMargin = self::$meta->margin ?? true;
       ?>
       <main class="page-content <?= $useMargin ? "page-content-margin" : "" ?>">
         <?php
@@ -113,3 +117,5 @@ class Layout {
     <?php
   }
 }
+
+Layout::$meta = new Meta();

@@ -70,6 +70,11 @@ function page()
                 "port" => $port,
                 "portssl" => $portssl ?: null
               ])) {
+
+                // Setup
+                $host = Host::select("*", ["hostname" => $hostname], 1)[0];
+                $host->setup();
+                
                 Logger::storeLog("Created new host: $hostname:$port");
                 header("Location: /hosting");
               }

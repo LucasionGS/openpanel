@@ -1,4 +1,5 @@
 <?php
+use OpenPanel\core\auth\User;
 use OpenPanel\core\db\Database;
 use OpenPanel\core\webhost\Host;
 function page() {

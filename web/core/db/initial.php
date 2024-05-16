@@ -30,7 +30,8 @@ function initial_database_setup(\mysqli $sql, string $db_database) {
     "CREATE TABLE IF NOT EXISTS users (
       id INT AUTO_INCREMENT PRIMARY KEY,
       username VARCHAR(255),
-      password VARCHAR(255)
+      password VARCHAR(255),
+      auth_token VARCHAR(255) UNIQUE
     )"
   );
 
@@ -52,4 +53,15 @@ function initial_database_setup(\mysqli $sql, string $db_database) {
 
   Settings::set("version", Info::$version);
   Settings::set("build", Info::$build);
+
+  $sql->query(
+    "CREATE TABLE IF NOT EXISTS extensions (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      name VARCHAR(255) UNIQUE,
+      enabled BOOLEAN DEFAULT FALSE,
+
+      -- Indexes
+      INDEX (enabled)
+    )"
+  );
 }

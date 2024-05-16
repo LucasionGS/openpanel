@@ -164,6 +164,9 @@ class Database {
   }
 
   static ?Database $instance = null;
+  /**
+   * @return Database
+   */
   public static function getInstance() {
     if (self::$instance === null) {
       global $CFG;
