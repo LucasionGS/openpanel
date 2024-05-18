@@ -1,7 +1,6 @@
 <?php
 namespace OpenPanel;
 use OpenPanel\core\auth\User;
-use OpenPanel\core\Extension;
 session_start();
 
 $path = $_SERVER["REQUEST_URI"];
@@ -21,6 +20,7 @@ if ($path !== "/install") {
 }
 
 use OpenPanel\core\Layout;
+use OpenPanel\core\Extension;
 
 function checkApiEndpoint($path) {
   $corePage = $path;
