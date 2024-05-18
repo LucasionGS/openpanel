@@ -58,7 +58,7 @@ class Extension extends Model {
   }
 
   public static function install(string $name, bool $enabled = false) {
-    $existing = self::select("id", ['name' => $name], 1)[0];
+    $existing = self::select("id", ['name' => $name], 1)[0] ?? null;
     
     // Read the extension's info file
     $pth = realpath(__DIR__ . "/../extensions/" . $name . "/$name.yml");
