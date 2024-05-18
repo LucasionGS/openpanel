@@ -59,6 +59,12 @@ function initial_database_setup(\mysqli $sql, string $db_database) {
       id INT AUTO_INCREMENT PRIMARY KEY,
       name VARCHAR(255) UNIQUE,
       enabled BOOLEAN DEFAULT FALSE,
+      display_name VARCHAR(255),
+      description TEXT DEFAULT NULL,
+      version VARCHAR(255), -- This is the version that on disk
+      installed_version VARCHAR(255),
+      -- This is the version that is currently installed. If this is different from version, might need to run an update script
+      author VARCHAR(255),
 
       -- Indexes
       INDEX (enabled)

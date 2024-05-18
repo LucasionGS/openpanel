@@ -11,13 +11,26 @@ class Extension extends Model {
   public int $id;
   public string $name;
   public bool $enabled;
+  public string $display_name;
+  public string $description;
+  public string $version;
+  public string $installed_version;
+  public string $author;
+
+  public function getPath() {
+    return realpath(__DIR__ . "/../extensions/" . $this->name);
+  }
 
   public static function getExtensionFolder() {
     return realpath(__DIR__ . "/../extensions");
   }
 
+  public static function getByName(string $name) {
+    return self::select("*", ['name' => $name], 1)[0] ?? null;
+  }
+
   protected static string $table = "extensions";
-  protected static array $fields = ["id", "name", "enabled"];
+  protected static array $fields = ["id", "name", "enabled", "display_name", "description", "version", "installed_version", "author"];
   
   public static function enable(string $name) {
     $ref = self::select("id", ['name' => $name], 1)[0];
@@ -45,9 +58,40 @@ class Extension extends Model {
   }
 
   public static function install(string $name, bool $enabled = false) {
-    // $sql = Database::getInstance();
-    // $sql->insert("extensions", ['name' => $name, 'enabled' => $enabled]);
-    self::insert(['name' => $name, 'enabled' => $enabled]);
+    $existing = self::select("id", ['name' => $name], 1)[0];
+    
+    // Read the extension's info file
+    $pth = realpath(__DIR__ . "/../extensions/" . $name . "/$name.yml");
+    if ($pth) {
+      $info = yaml_parse_file($pth);
+      $display_name = $info["name"] ?? $name;
+      $description = $info["description"] ?? "";
+      $version = $info["version"] ?? throw new \Exception("Extension $name does not have a version number");
+      $author = $info["author"] ?? "<Unknown>";
+    }
+    else {
+      throw new \Exception("Extension $name does not have an info file. ($name.yml)");
+    }
+
+    if ($existing) {
+      self::update($existing->id, [
+        'display_name' => $display_name,
+        'description' => $description,
+        'version' => $version,
+        'author' => $author
+      ]);
+      return;
+    }
+    
+    self::insert([
+      'name' => $name,
+      'enabled' => $enabled,
+      'display_name' => $display_name,
+      'description' => $description,
+      'version' => $version,
+      'installed_version' => $version,
+      'author' => $author
+    ]);
   }
 
   public static function uninstall(string $name) {
@@ -57,6 +101,33 @@ class Extension extends Model {
       return;
     }
     self::delete($ref->id);
+  }
+
+  public static function upgrade(string $name) {
+    $ref = self::getByName($name);
+    if ($ref === null || ($ref->installed_version == $ref->version)) {
+      return;
+    }
+    $pth = realpath(__DIR__ . "/../extensions/" . $name . "/$name.yml");
+    if ($pth) {
+      $info = yaml_parse_file($pth);
+      $version = $info["version"] ?? throw new \Exception("Extension $name does not have a version number");
+    }
+    else {
+      throw new \Exception("Extension $name does not have an info file. ($name.yml)");
+    }
+
+    // Check for upgrade.php's existence
+    $pth = realpath(__DIR__ . "/../extensions/" . $name . "/upgrade.php");
+    if ($pth) {
+      require $pth;
+      if (function_exists("upgrade")) {
+        "upgrade"(Info::versionToValue($ref->installed_version), Info::versionToValue($version));
+      }
+    }
+    
+    self::update($ref->
+    id, ['installed_version' => $version]);
   }
 
   /**
@@ -85,14 +156,7 @@ class Extension extends Model {
       if ($file == "." || $file == "..") {
         continue;
       }
-      $exists = self::count(['name' => $file]) > 0;
-      if (!$exists) {
-        self::install($file);
-        // echo "Installed extension: $file\n";
-      }
-      else {
-        // echo "Extension already installed: $file\n";
-      }
+      self::install($file);
     }
   }
 }

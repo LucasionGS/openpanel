@@ -113,7 +113,7 @@ function page() {
       <input type="hidden" name="db_password" value="<?= $db_password ?>">
       <input type="hidden" name="db_database" value="<?= $db_database ?>">
       <input type="hidden" name="action" value="finalize">
-      <input type="submit" value="Create new host">
+      <input type="submit" value="Finalize installation">
     </form>
   <?php else: ?>
     <!-- Loading -->

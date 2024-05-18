@@ -22,11 +22,18 @@ class Settings extends Model {
   }
 
   public static function set(string $key, string $value) {
-    $existing = self::select("value", ["name" => $key], 1)[0] ?? null;
+    $existing = self::select(["id", "value"], ["name" => $key], 1)[0] ?? null;
     if ($existing) {
       self::update($existing->id, ["value" => $value]);
       return;
     }
     self::insert(["name" => $key, "value" => $value]);
+  }
+
+  public static function clear(string $key) {
+    $existing = self::select("id", ["name" => $key], 1)[0] ?? null;
+    if ($existing) {
+      self::delete($existing->id);
+    }
   }
 }

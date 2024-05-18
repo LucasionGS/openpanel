@@ -256,6 +256,14 @@ button[type="submit"]:hover, input[type="submit"]:hover {
   background-color: #8c8c8c !important;
 }
 
+.btn-warning {
+  background-color: #ffcc00 !important;
+}
+
+.btn-warning:hover {
+  background-color: #ff9900 !important;
+}
+
 .btn-danger {
   background-color: #ba0000 !important;
 }
@@ -309,9 +317,9 @@ desc {
 /* Tables */
 
 table {
+  /* table-layout: fixed; */
   border-collapse: collapse;
   width: 100%;
-  table-layout: fixed;
 
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;

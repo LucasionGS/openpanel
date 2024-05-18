@@ -2,6 +2,7 @@
 namespace OpenPanel\core\webhost;
 use OpenPanel\core\db\Database;
 use OpenPanel\core\db\Model;
+use OpenPanel\core\Extension;
 use OpenPanel\core\logging\Logger;
 
 class Host extends Model {
@@ -11,8 +12,9 @@ class Host extends Model {
   public int $portssl;
 
   private static string $vhostsAvailableDir = "/etc/nginx/sites-available";
-  private static string $vhostsEnabledDir = "/etc/nginx/sites-available";
+  private static string $vhostsEnabledDir = "/etc/nginx/sites-enabled";
   private static string $webRoot = "/var/www/vhosts";
+  private static string $webTemplates = __DIR__ . "/../../web-templates";
 
   static string $table = "hosts";
   protected static array $fields = ["id", "hostname", "port", "portssl"];
@@ -23,6 +25,16 @@ class Host extends Model {
 
   public function getDeleteUrl() {
     return "/hosting/delete?id=$this->id";
+  }
+
+  public function getTemplates() {
+    // Get core templates
+    $coreTemps = array_diff(scandir(static::$webTemplates), [".", ".."]);
+    $exts = Extension::select("*", ["enabled" => 1], 0);
+    $extTemps = [];
+    foreach ($exts as $ext) {
+      $extTemps = array_merge($extTemps, array_diff(scandir($ext->getPath() . "/web-templates"), [".", ".."]));
+    }
   }
 
   public function setup() {
@@ -46,6 +58,12 @@ class Host extends Model {
     $phpVersion = $addons["phpVersion"] ?? "8.1";
     $server_name = $this->hostname;
     $root = static::$webRoot . "/" . $this->hostname;
+    $template = $addons["template"] ?? "default";
+
+    // Addons
+    if (isset($addons["aliases"]) && count($addons["aliases"]) > 0) {
+      $server_name .= " " . join(" ", $addons["aliases"]);
+    }
     
     $vhost = <<<VHOST
 server {
@@ -83,11 +101,13 @@ VHOST;
     $vhostPath = static::$vhostsAvailableDir . "/" . $this->hostname;
     file_put_contents($vhostPath, $vhost); // This works
 
-    if (!file_exists(static::$vhostsEnabledDir . "/" . $this->hostname)) {
-      symlink($vhostPath, static::$vhostsEnabledDir . "/" . $this->hostname); // This doesn't work, why? Doesn't continue
-    }
-
+    // Create directory
+    mkdir($root, 0755, true);
     $this->enable();
+
+
+    
+    
     $this->reloadNginx();
   }
 

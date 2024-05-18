@@ -17,6 +17,7 @@ RUN apt install -y \
     php8.1-soap \
     php8.1-xml \
     php8.1-xmlrpc \
+    php8.1-yaml \
     php8.1-zip
 
 WORKDIR /var/www/html

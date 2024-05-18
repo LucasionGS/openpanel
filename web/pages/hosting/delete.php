@@ -20,7 +20,8 @@ function page()
   }
 
   $id = intval($_GET["id"]);
-  $host = $sql->select("hosts", $id)[0] ?? null;
+  // $host = $sql->select("hosts", $id)[0] ?? null;
+  $host = Host::find($id);
 
   if (!$host) {
     Logger::error("No host found with ID: $id");
@@ -31,7 +32,8 @@ function page()
     $action = $_POST["action"];
     switch ($action) {
       case "delete":
-        // if ($sql->query("DELETE FROM hosts WHERE id = $id")) {
+        $host->deleteVhost();
+
         if (Host::delete($id)) {
           Logger::storeLog("Deleted host with ID: $id");
           header("Location: /hosting");
@@ -55,7 +57,7 @@ function page()
     <form method="post">
       <?php Logger::log(
         "Are you sure you want to delete this host?",
-        "Delete host " . $host["hostname"]
+        "Delete host " . $host->hostname
       ) ?>
       <button type="submit" name="action" value="delete" class="btn-danger">Delete</button>
       <button type="submit" name="action" value="cancel" class="btn-standard">Cancel</button>

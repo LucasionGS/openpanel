@@ -27,6 +27,11 @@ function page() {
     else if ($_POST["action"] === "disable") {
       Extension::disable($_POST["extensionName"]);
     }
+    else if ($_POST["action"] === "upgrade") {
+      Extension::upgrade($_POST["extensionName"]);
+
+      header("Location: /extend");
+    }
   }
   ?>
     <div>
@@ -39,8 +44,12 @@ function page() {
       <table>
         <thead>
           <tr>
+            <th></th>
             <th>Name</th>
-            <th>Enabled</th>
+            <th>Description</th>
+            <th>Author</th>
+            <th>Version (Disk)</th>
+            <th>Version (Installed)</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -51,32 +60,50 @@ function page() {
           foreach ($exts as $ext) {
             ?>
             <tr>
-              <?php
-              if ($ext->enabled):
-              ?>
-              <td>
-                <a href="/_/<?= $ext->name ?>"><?= $ext->name ?></a>
+              <td style="position: relative">
+                <div style="
+                  position: absolute;
+                  top: 50%;
+                  right: 50%;
+                  transform: translate(50%, -50%);
+                  width: 100%;
+                  aspect-ratio: 1/1;
+                  border-radius: 50%;
+                  background-color: <?= $ext->enabled ? "lightgreen" : "darkred" ?>;
+                "></div>
+                <?php if ($ext->version !== $ext->installed_version): ?>
+                  <div style="
+                    position: absolute;
+                    top: 50%;
+                    right: 50%;
+                    transform: translate(50%, -50%);
+                    width: 50%;
+                    aspect-ratio: 1/1;
+                    border-radius: 50%;
+                    background-color: yellow;
+                  "></div>
+                <?php endif; ?>
               </td>
-              <td>Yes</td>
-              <?php
-              else:
-              ?>
               <td>
-                <?= $ext->name ?>
+              <?php if ($ext->enabled): ?>
+                <a href="/_/<?= $ext->name ?>"><?= $ext->display_name ?? $ext->name ?></a>
+              <?php else: ?>
+                <?= $ext->display_name ?? $ext->name ?>
+              <?php endif; ?>
               </td>
-              <td>No</td>
-              <?php
-              endif;
-              ?>
+              <td><?= $ext->description ?></td>
+              <td><?= $ext->author ?></td>
+              <td><?= $ext->version ?></td>
+              <td><?= $ext->installed_version ?></td>
+              <!--<td><?= $ext->enabled ? "Yes" : "No" ?></td>-->
               <td>
-                <!--
-                <a href="/extensions/<?= $ext->id ?>/enable">Enable</a>
-                <a href="/extensions/<?= $ext->id ?>/disable">Disable</a>
-                -->
                 <form action="/extend" method="post">
                   <input type="hidden" name="extensionName" value="<?= $ext->name ?>">
                   <button <?= $ext->enabled ? "disabled": "" ?> type="submit" name="action" value="enable">Enable</button>
                   <button <?= !$ext->enabled ? "disabled": "" ?> type="submit" name="action" value="disable">Disable</button>
+                  <?php if ($ext->version !== $ext->installed_version): ?>
+                    <button class="btn-warning" type="submit" name="action" value="upgrade">Upgrade</button>
+                  <?php endif; ?>
                 </form>
               </td>
             </tr>
