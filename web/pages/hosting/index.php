@@ -34,6 +34,7 @@ function page()
           <th>Hostname</th>
           <th>Port</th>
           <th>Port SSL</th>
+          <th>Template</th>
           <th></th>
         </tr>
       </thead>
@@ -51,6 +52,12 @@ function page()
             </td>
             <td>
               <?= $host->portssl ?: "443" ?>
+            </td>
+            <td>
+              <?php
+              $addons = $host->parseAddons();
+              echo $addons["template"] ?? "<i>Unknown</i>";
+              ?>
             </td>
             <td>
               <a href="<?= $host->getEditUrl() ?>">

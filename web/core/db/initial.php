@@ -22,7 +22,8 @@ function initial_database_setup(\mysqli $sql, string $db_database) {
       id INT AUTO_INCREMENT PRIMARY KEY,
       hostname VARCHAR(255),
       port INT DEFAULT 80,
-      portssl INT DEFAULT 443
+      portssl INT DEFAULT 443,
+      addons TEXT DEFAULT NULL
     )"
   );
 

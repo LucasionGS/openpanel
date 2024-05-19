@@ -1,6 +1,7 @@
 <?php
 use OpenPanel\core\logging\Logger;
 use OpenPanel\core\webhost\Host;
+use OpenPanel\core\webhost\HostAddonForm;
 
 function head()
 {
@@ -14,8 +15,25 @@ function page()
   $sql = \OpenPanel\core\db\Database::getInstance();
 
   $editId = $_GET["id"] ?? null;
+  $templates = Host::getTemplates(); // ["basic_page" => "/var/www/openpanel/core/templates/nginx/basic_page"]
+  $template = $_GET["template"] ?? null;
+  if (!$template) {
+    $template = array_key_first($templates);
+
+    if (!$template) {
+      Logger::error("No templates found");
+      return;
+    }
+  }
+
+  // Ensure the template exists
+  if (!isset($templates[$template])) {
+    Logger::error("Template not found: $template");
+    return;
+  }
   
   $host = null;
+  $addons = [];
   
   if (isset($editId) && is_numeric($editId)) {
     // $host = $sql->select("hosts", intval($editId))[0] ?? null;
@@ -25,7 +43,19 @@ function page()
       Logger::error("No host found with ID: $editId");
       return;
     }
+
+    $addons = $host->parseAddons();
   }
+
+  // Get all $_POST that is prefixed with addon_
+  foreach ($_POST as $key => $value) {
+    if (strpos($key, "addon_") === 0) {
+      $addons[substr($key, 6)] = $value;
+    }
+  }
+
+  $addons["template"] = $template; // Fixed addon
+  
   
   try {
     if (isset($_POST["action"])) {
@@ -49,7 +79,8 @@ function page()
               if ($sql->update("hosts", [
                 "hostname" => $hostname,
                 "port" => $port,
-                "portssl" => $portssl
+                "portssl" => $portssl,
+                "addons" => json_encode($addons)
               ], $id)) {
                 Logger::storeLog("Updated host with ID: $id");
                 header("Location: /hosting");
@@ -68,12 +99,13 @@ function page()
               if (Host::insert([
                 "hostname" => $hostname,
                 "port" => $port,
-                "portssl" => $portssl ?: null
+                "portssl" => $portssl ?: null,
+                "addons" => json_encode($addons)
               ])) {
 
                 // Setup
                 $host = Host::select("*", ["hostname" => $hostname], 1)[0];
-                $host->setup();
+                $host->setup($addons);
                 
                 Logger::storeLog("Created new host: $hostname:$port");
                 header("Location: /hosting");
@@ -105,6 +137,21 @@ function page()
       <input type="hidden" name="action" value="create">
       <!-- <div style="display: flex; gap: 16px;"> -->
       <div>
+        <!-- Templates -->
+        <div>
+          <label for="template">Template</label>
+          <br>
+          <select name="template" id="template" onchange="window.location.href = '/hosting/edit?id=<?= $host ? $host->id : '' ?>&template=' + this.value">
+            <?php
+            foreach ($templates as $key => $value) {
+              ?>
+              <option value="<?= $key ?>" <?= $template === $key ? "selected" : "" ?>><?= $key ?></option>
+              <?php
+            }
+            ?>
+          </select>
+        </div>
+        
         <div>
           <label for="hostname">Hostname</label>
           <br>
@@ -134,7 +181,7 @@ function page()
         </div>
 
         <div>
-          <label for="portssl">portssl</label>
+          <label for="portssl">Port (SSL)</label>
           <br>
           <input
             value="<?= $host ? $host->portssl : "443" ?>"
@@ -147,6 +194,25 @@ function page()
             required
           >
         </div>
+
+        <?php
+          // Get the form.php from the templete, if it exists
+          $formPath = $templates[$template] . "/form.php";
+          if (file_exists($formPath)) {
+            require $formPath;
+
+            if (function_exists("form")) {
+              echo "<hr>";
+              echo "<br>";
+              $form = new HostAddonForm();
+              form($form);
+              $form->render($addons);
+            }
+          }
+          // if (isset($templates[$template])) {
+          // }
+        ?>
+        
       </div>
       <?php
       if ($host) {
