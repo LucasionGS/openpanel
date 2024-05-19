@@ -70,4 +70,12 @@ function initial_database_setup(\mysqli $sql, string $db_database) {
       INDEX (enabled)
     )"
   );
+
+  // $sql->query(
+  //   "CREATE TABLE IF NOT EXISTS host_templates (
+  //     id INT AUTO_INCREMENT PRIMARY KEY,
+  //     extension_id INT NULL,
+      
+  //   )"
+  // );
 }

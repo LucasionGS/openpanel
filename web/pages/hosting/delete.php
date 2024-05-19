@@ -32,7 +32,7 @@ function page()
     $action = $_POST["action"];
     switch ($action) {
       case "delete":
-        $host->deleteVhost();
+        $host->deleteVhost(true);
 
         if (Host::delete($id)) {
           Logger::storeLog("Deleted host with ID: $id");
