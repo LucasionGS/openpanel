@@ -24,11 +24,19 @@ WORKDIR /var/www/html
 COPY ./start.sh /start.sh
 RUN chmod +x /start.sh
 
+# Vhosts
 RUN mkdir /var/www/vhosts -p
+
 # Make sure www-data owns all files PHP should write to
 RUN chown www-data:www-data /var/www -R
 RUN chown www-data:www-data /etc/nginx/sites-available -R
 RUN chown www-data:www-data /etc/nginx/sites-enabled -R
 RUN chmod 775 /var/www -R
+
+# scripts
+COPY ./nginx/scripts /var/www/scripts
+RUN chown root:www-data /var/www/scripts -R
+RUN chmod 755 /var/www/scripts/*.sh
+RUN chmod u+s /var/www/scripts/*.sh
 
 CMD ["bash", "/start.sh"]
